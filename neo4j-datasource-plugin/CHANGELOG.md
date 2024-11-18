@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Set appropiate Grafana minVersion
-- Pass context from grafana api to neo4j for better handling of timeouts and query cancelations. 
+- Pass context from grafana api to neo4j for better handling of timeouts and query cancelations.
 
 ## [1.3.0] - 2023-07-31
 
@@ -30,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reduced Loglevel to Debug
 - Replaced deprecated Neo4J Driver methods
-
 
 ## [1.2.0] - 2023-06-11
 

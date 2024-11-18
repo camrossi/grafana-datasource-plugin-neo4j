@@ -14,11 +14,9 @@ Query Neo4j DataSource with Cypher Query Language and display as Table
 
 ![DataSource Query Editor](https://raw.githubusercontent.com/denniskniep/grafana-datasource-plugin-neo4j/main/neo4j-datasource-plugin/src/img/DataSourceQueryEditor.png)
 
-
 Query Neo4j DataSource with Cypher Query Language and display as Graph
 
 ![DataSource Query Editor](https://raw.githubusercontent.com/denniskniep/grafana-datasource-plugin-neo4j/main/neo4j-datasource-plugin/src/img/DataSourceQueryEditorGraph.png)
-
 
 ## Links
 

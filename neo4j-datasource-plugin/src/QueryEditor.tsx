@@ -41,7 +41,17 @@ export class QueryEditor extends PureComponent<Props> {
   render() {
     return (
       <div>
-        <CodeEditor height={"240px"} onEditorDidMount={ (editor) => { editor.onDidChangeModelContent (() => {this.onCypherQueryChange(editor.getValue())})}} monacoOptions={{ minimap: {enabled : false}, automaticLayout: true}} value={this.props.query.cypherQuery || ''} language={'cypher'} />
+        <CodeEditor
+          height={'240px'}
+          onEditorDidMount={(editor) => {
+            editor.onDidChangeModelContent(() => {
+              this.onCypherQueryChange(editor.getValue());
+            });
+          }}
+          monacoOptions={{ minimap: { enabled: false }, automaticLayout: true }}
+          value={this.props.query.cypherQuery || ''}
+          language={'cypher'}
+        />
         <InlineFieldRow>
           <InlineFormLabel width={5}>Format</InlineFormLabel>
           <Select
