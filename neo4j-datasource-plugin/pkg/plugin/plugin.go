@@ -492,11 +492,31 @@ func toValue(val interface{}) interface{} {
 		return asJson(val)
 	}
 }
-
 func asJson(val interface{}) *string {
+	// Check if the data should be converted to json or returned as is
+	log.DefaultLogger.Info("Converting value to json", "value", val)
+	log.DefaultLogger.Info("Val Type is", fmt.Sprintf("%T", val))
 
-	res := fmt.Sprint(val)
-	return &res
+	switch val.(type) {
+
+		case string:
+			
+			str := fmt.Sprintf("%v", val)
+			log.DefaultLogger.Info("Case def:", "value", str)
+			return &str
+
+		default:
+			jsonVal, err := json.Marshal(val)
+			if err != nil {
+				log.DefaultLogger.Error("Error converting value to json", ERROR, err.Error())
+				return nil
+			}
+			str := string(jsonVal)
+			log.DefaultLogger.Info("Case Node or Rel:", "value", str)
+			return &str
+
+
+		} 
 }
 
 type neo4JQuery struct {

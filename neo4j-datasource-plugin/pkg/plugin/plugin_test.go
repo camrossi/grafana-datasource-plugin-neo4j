@@ -49,7 +49,7 @@ func TestHealthcheckIsErrorDueToDeserialize(t *testing.T) {
 	settings := backend.DataSourceInstanceSettings{}
 	settings.JSONData = []byte{1}
 
-	_, err := NewNeo4JDatasource(settings)
+	_, err := NewNeo4JDatasource(context.Background(), settings)
 
 	expectedMsg := "can not deserialize DataSource settings"
 	if !strings.Contains(err.Error(), expectedMsg) {
@@ -135,7 +135,7 @@ func testCheckHealthAndMessage(t *testing.T, neo4JSettings neo4JSettings, expect
 
 func testCheckHealthAndMessageWithSettings(t *testing.T, settings backend.DataSourceInstanceSettings, expectedStatus backend.HealthStatus, expectedMessagePart string) {
 
-	instance, err := NewNeo4JDatasource(settings)
+	instance, err := NewNeo4JDatasource(context.Background(), settings)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -343,7 +343,7 @@ func TestNodeColumn(t *testing.T) {
 	skipIfIsShort(t)
 	expectedFrame := data.NewFrame("response",
 		data.NewField("m", nil, []*string{
-			ptrS("{\"Id\":0,\"ElementId\":\"0\",\"Labels\":[\"Movie\"],\"Props\":{\"released\":1999,\"tagline\":\"Welcome to the Real World\",\"title\":\"The Matrix\"}}"),
+			ptrS("{\"Id\":0,\"ElementId\":\"4:379d49c2-e63a-4cd4-8ebe-42177841179b:0\",\"Labels\":[\"Movie\"],\"Props\":{\"color\":\"green\",\"icon\":\"camera\",\"released\":1999,\"tagline\":\"Welcome to the Real World\",\"title\":\"The Matrix\"}}"),
 		}),
 	)
 
@@ -356,7 +356,7 @@ func TestRelationshipColumn(t *testing.T) {
 	skipIfIsShort(t)
 	expectedFrame := data.NewFrame("response",
 		data.NewField("r", nil, []*string{
-			ptrS("{\"Id\":0,\"ElementId\":\"0\",\"StartId\":1,\"StartElementId\":\"1\",\"EndId\":0,\"EndElementId\":\"0\",\"Type\":\"ACTED_IN\",\"Props\":{\"roles\":[\"Neo\"]}}"),
+			ptrS("{\"Id\":0,\"ElementId\":\"5:379d49c2-e63a-4cd4-8ebe-42177841179b:0\",\"StartId\":1,\"StartElementId\":\"4:379d49c2-e63a-4cd4-8ebe-42177841179b:1\",\"EndId\":0,\"EndElementId\":\"4:379d49c2-e63a-4cd4-8ebe-42177841179b:0\",\"Type\":\"ACTED_IN\",\"Props\":{\"roles\":[\"Neo\"]}}"),
 		}),
 	)
 
@@ -458,8 +458,8 @@ func TestGraphFormat(t *testing.T) {
 	skipIfIsShort(t)
 	expectedNodesFrame := data.NewFrame("nodes",
 		data.NewField("id", nil, []*string{
-			ptrS("1"),
-			ptrS("0"),
+			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:1"),
+			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
 		}),
 		data.NewField("title", nil, []*string{
 			ptrS("Person"),
@@ -473,8 +473,20 @@ func TestGraphFormat(t *testing.T) {
 			ptrS("1964"),
 			nil,
 		}),
+		data.NewField("color", nil, []*string{
+			nil,
+			ptrS("green"),
+		}),
+		data.NewField("icon", nil, []*string{
+			nil,
+			ptrS("camera"),
+		}),
+		data.NewField("mainstat", nil, []*string{
+			ptrS("Neo"),
+			nil,
+		}),
 		data.NewField("detail__name", nil, []*string{
-			ptrS("\"Keanu Reeves\""),
+			ptrS("Keanu Reeves"),
 			nil,
 		}),
 		data.NewField("detail__released", nil, []*string{
@@ -483,23 +495,23 @@ func TestGraphFormat(t *testing.T) {
 		}),
 		data.NewField("detail__tagline", nil, []*string{
 			nil,
-			ptrS("\"Welcome to the Real World\""),
+			ptrS("Welcome to the Real World"),
 		}),
-		data.NewField("detail__title", nil, []*string{
+		data.NewField("title", nil, []*string{
 			nil,
-			ptrS("\"The Matrix\""),
+			ptrS("The Matrix"),
 		}),
 	)
 
 	expectedEdgesFrame := data.NewFrame("edges",
 		data.NewField("id", nil, []*string{
-			ptrS("0"),
+			ptrS("5:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
 		}),
 		data.NewField("source", nil, []*string{
-			ptrS("1"),
+			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:1"),
 		}),
 		data.NewField("target", nil, []*string{
-			ptrS("0"),
+			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
 		}),
 		data.NewField("mainStat", nil, []*string{
 			ptrS("ACTED_IN"),
@@ -588,7 +600,7 @@ func runNeo4JIntegrationTest(t *testing.T, cypher string, format string) backend
 	settings := backend.DataSourceInstanceSettings{}
 	settings.JSONData = asJsonBytes(t, neo4JSettings)
 
-	instance, _ := NewNeo4JDatasource(settings)
+	instance, _ := NewNeo4JDatasource(context.Background(), settings)
 	neo4JDatasource := instance.(*Neo4JDatasource)
 
 	res, err := neo4JDatasource.query(context.Background(), neo4JQuery)
