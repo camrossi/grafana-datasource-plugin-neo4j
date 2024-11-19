@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"slices"
 	"sort"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -42,7 +44,7 @@ type Neo4JDatasource struct {
 }
 
 // creates a new datasource instance.
-func NewNeo4JDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewNeo4JDatasource(_ context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	id := uuid.New().String()
 	log.DefaultLogger.Debug("Create Datasource", DATASOURCE_UID, id)
 	neo4JSettings, err := unmarshalDataSourceSettings(settings)
@@ -224,6 +226,8 @@ func createGraphDataFrame(name string, typ interface{}, metaFields []string, all
 
 	propMap := make(map[string]int)
 	propIndex := len(metaFields)
+	var optionalFields = []string{}
+
 
 	for _, currentRecord := range allRecords {
 		values := currentRecord.Values
@@ -238,11 +242,15 @@ func createGraphDataFrame(name string, typ interface{}, metaFields []string, all
 				_, isType = v.(dbtype.Node)
 				if isType {
 					props = v.(dbtype.Node).Props
+					optionalFields = []string{"title", "subtitle", "mainstat", "secondarystat", "color", "icon", "nodeRadius", "highlighted"}
+
 				}
 			case dbtype.Relationship:
 				_, isType = v.(dbtype.Relationship)
 				if isType {
 					props = v.(dbtype.Relationship).Props
+					optionalFields = []string{"mainstat", "secondarystat", "thickness","highlighted", "color", "strokeDasharray"}
+
 				}
 			}
 
@@ -265,7 +273,13 @@ func createGraphDataFrame(name string, typ interface{}, metaFields []string, all
 	sort.Strings(propNames)
 
 	for _, name := range propNames {
-		fieldList = append(fieldList, data.NewField("detail__"+name, nil, []*string{}))
+		log.DefaultLogger.Info("Adding field: " + name)
+		if slices.Contains(optionalFields, name) {
+			log.DefaultLogger.Info("Found an optionalField: " + name)
+			fieldList = append(fieldList, data.NewField(name, nil, []*string{}))
+		} else {
+			fieldList = append(fieldList, data.NewField("detail__"+name, nil, []*string{}))
+		}
 		propMap[name] = propIndex
 		propIndex = propIndex + 1
 	}
@@ -480,11 +494,8 @@ func toValue(val interface{}) interface{} {
 }
 
 func asJson(val interface{}) *string {
-	r, err := json.Marshal(val)
-	if err != nil {
-		log.DefaultLogger.Info("Json marshalling failed ", ERROR, err)
-	}
-	res := string(r)
+
+	res := fmt.Sprint(val)
 	return &res
 }
 

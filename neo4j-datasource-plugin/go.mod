@@ -1,4 +1,4 @@
-module github.com/grafana/grafana-starter-datasource-backend
+module neo4j-datasource-plugin
 
 go 1.22
 
