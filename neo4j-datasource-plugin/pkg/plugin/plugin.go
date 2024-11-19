@@ -273,9 +273,9 @@ func createGraphDataFrame(name string, typ interface{}, metaFields []string, all
 	sort.Strings(propNames)
 
 	for _, name := range propNames {
-		log.DefaultLogger.Info("Adding field: " + name)
+		log.DefaultLogger.Debug("Adding field: " + name)
 		if slices.Contains(optionalFields, name) {
-			log.DefaultLogger.Info("Found an optionalField: " + name)
+			log.DefaultLogger.Debug("Found an optionalField: " + name)
 			fieldList = append(fieldList, data.NewField(name, nil, []*string{}))
 		} else {
 			fieldList = append(fieldList, data.NewField("detail__"+name, nil, []*string{}))
@@ -494,15 +494,15 @@ func toValue(val interface{}) interface{} {
 }
 func asJson(val interface{}) *string {
 	// Check if the data should be converted to json or returned as is
-	log.DefaultLogger.Info("Converting value to json", "value", val)
-	log.DefaultLogger.Info("Val Type is", fmt.Sprintf("%T", val))
+	log.DefaultLogger.Debug("Converting value to json", "value", val)
+	log.DefaultLogger.Debug("Val Type is", fmt.Sprintf("%T", val))
 
 	switch val.(type) {
 
 		case string:
 			
 			str := fmt.Sprintf("%v", val)
-			log.DefaultLogger.Info("Case def:", "value", str)
+			log.DefaultLogger.Debug("Case def:", "value", str)
 			return &str
 
 		default:
@@ -512,7 +512,7 @@ func asJson(val interface{}) *string {
 				return nil
 			}
 			str := string(jsonVal)
-			log.DefaultLogger.Info("Case Node or Rel:", "value", str)
+			log.DefaultLogger.Debug("Case Node or Rel:", "value", str)
 			return &str
 
 
