@@ -5,6 +5,7 @@ import {
   MetricFindValue,
   DataFrame,
   DataQueryRequest,
+  AdHocVariableFilter,
   ScopedVars,
 } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
@@ -23,7 +24,7 @@ export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptio
    *
    * Interpolation options: https://grafana.com/docs/grafana/latest/variables/advanced-variable-format-options/
    */
-  applyTemplateVariables(query: MyQuery, scopedVars: ScopedVars): Record<string, any> {
+  applyTemplateVariables(query: MyQuery, scopedVars: ScopedVars, filters?: AdHocVariableFilter[]): MyQuery {
     const evaluatedCypherQuery = getTemplateSrv().replace(query.cypherQuery, scopedVars);
     return {
       ...query,

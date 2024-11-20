@@ -474,7 +474,7 @@ func TestGraphFormat(t *testing.T) {
 			nil,
 		}),
 		data.NewField("color", nil, []*string{
-			nil,
+			ptrS("green"),
 			ptrS("green"),
 		}),
 		data.NewField("icon", nil, []*string{
