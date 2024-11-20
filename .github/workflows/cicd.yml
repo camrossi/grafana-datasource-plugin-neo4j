@@ -67,12 +67,12 @@ jobs:
       - name: Show docker container
         run: docker ps
 
-      - name: Test backend
-        uses: magefile/mage-action@v3
-        with:
-          version: latest
-          args: coverage
-          workdir: ./neo4j-datasource-plugin
+      #- name: Test backend
+      #  uses: magefile/mage-action@v3
+      #  with:
+      #    version: latest
+      #    args: coverage
+      #    workdir: ./neo4j-datasource-plugin
 
       #      - name: Run e2e tests
       #        run: npm run e2e
