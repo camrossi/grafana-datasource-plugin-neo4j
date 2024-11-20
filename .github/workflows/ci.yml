@@ -15,12 +15,12 @@ jobs:
       run:
         working-directory: ./neo4j-datasource-plugin
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: "./neo4j-datasource-plugin/package-lock.json"
 
@@ -48,7 +48,7 @@ jobs:
         run: export GOFLAGS=-buildvcs=false
 
       - name: Build backend
-        uses: magefile/mage-action@v2
+        uses: magefile/mage-action@v3
         with:
           version: latest
           args: buildAll
@@ -68,7 +68,7 @@ jobs:
         run: docker ps
 
       - name: Test backend
-        uses: magefile/mage-action@v2
+        uses: magefile/mage-action@v3
         with:
           version: latest
           args: coverage
