@@ -580,7 +580,8 @@ func runNeo4JIntegrationTableTest(t *testing.T, cypher string, expected *data.Fr
 
 	// Ignore elementID in the comparison as this can change and is dynamic. 
 	diff := cmp.Diff(frame, expected, append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
-		return p.Last().String() == ".ElementId"
+		last := p.Last().String()
+		return last == ".ElementId" || last == ".id"
 	}, cmp.Ignore()))...)
 	if diff != "" {
 		t.Fatal(diff)
