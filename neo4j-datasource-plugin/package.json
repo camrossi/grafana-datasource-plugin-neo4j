@@ -5,8 +5,7 @@
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
-    "e2e": "yarn exec cypress install && yarn exec grafana-e2e run",
-    "e2e:update": "yarn exec cypress install && yarn exec grafana-e2e run --update-screenshots",
+    "e2e": "playwright playwright-tests",
     "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "yarn run lint --fix",
     "server": "docker compose up --build",
@@ -20,10 +19,10 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@grafana/e2e": "9.5.3",
-    "@grafana/e2e-selectors": "9.5.3",
     "@grafana/eslint-config": "^7.0.0",
+    "@grafana/plugin-e2e": "^1.12.2",
     "@grafana/tsconfig": "^2.0.0",
+    "@playwright/test": "^1.49.0",
     "@swc/core": "^1.9.2",
     "@swc/helpers": "^0.5.15",
     "@swc/jest": "^0.2.37",
