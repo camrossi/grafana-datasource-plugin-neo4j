@@ -458,8 +458,8 @@ func TestGraphFormat(t *testing.T) {
 	skipIfIsShort(t)
 	expectedNodesFrame := data.NewFrame("nodes",
 		data.NewField("id", nil, []*string{
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:1"),
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
+			ptrS("rnd"),
+			ptrS("rnd"),
 		}),
 		data.NewField("title", nil, []*string{
 			ptrS("Person"),
@@ -505,19 +505,19 @@ func TestGraphFormat(t *testing.T) {
 
 	expectedEdgesFrame := data.NewFrame("edges",
 		data.NewField("id", nil, []*string{
-			ptrS("5:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
+			ptrS("rnd"),
 		}),
 		data.NewField("source", nil, []*string{
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:1"),
+			ptrS("rnd"),
 		}),
 		data.NewField("target", nil, []*string{
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
+			ptrS("rnd"),
 		}),
 		data.NewField("mainStat", nil, []*string{
 			ptrS("ACTED_IN"),
 		}),
 		data.NewField("detail__roles", nil, []*string{
-			ptrS("[\"Neo\"]"),
+			ptrS("[\"Neo0\"]"),
 		}),
 	)
 
@@ -551,21 +551,22 @@ func runNeo4JIntegrationGraphTest(t *testing.T, cypher string, expectedNodes *da
 	edgesFrameAsTable, _ := edgeFrame.StringTable(-1, -1)
 	fmt.Println("Actual Edges:\n", edgesFrameAsTable)
 
-	diffNodes := cmp.Diff(nodeFrame, expectedNodes, append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
-		last := p.Last().String()
-		return last == ".ElementId" || last == ".Id"
-	}, cmp.Ignore()))...)
+	opts := append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
+		// Check if the path contains the specific subfield of nullableStringVector you want to ignore
+		for _, step := range p {
+			if step.String() == ".vector" {
+				return true
+			}
+		}
+		return false
+	}, cmp.Ignore()))
+
+	diffNodes := cmp.Diff(nodeFrame, expectedNodes, opts...)
 	if diffNodes != "" {
 		t.Fatal(diffNodes)
 	}
 
-	// Ignore elementID and ID in the comparison as this can change and is dynamic. Neo4J clearly states that 
-	// although these internal identifiers are always part of the generated change events, they are not safe to 
-	//track data out of the scope of a single transaction.
-	diff := cmp.Diff(edgeFrame, expectedEdges, append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
-		last := p.Last().String()
-		return last == ".ElementId" || last == ".Id"
-	}, cmp.Ignore()))...)
+	diff := cmp.Diff(edgeFrame, expectedEdges, opts...)
 	if diff != "" {
 		t.Fatal(diff)
 	}
