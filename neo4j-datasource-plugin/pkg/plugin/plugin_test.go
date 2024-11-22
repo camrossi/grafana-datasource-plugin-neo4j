@@ -551,16 +551,24 @@ func runNeo4JIntegrationGraphTest(t *testing.T, cypher string, expectedNodes *da
 	edgesFrameAsTable, _ := edgeFrame.StringTable(-1, -1)
 	fmt.Println("Actual Edges:\n", edgesFrameAsTable)
 
-	diffNodes := cmp.Diff(nodeFrame, expectedNodes, data.FrameTestCompareOptions()...)
+	diffNodes := cmp.Diff(nodeFrame, expectedNodes, append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
+		last := p.Last().String()
+		return last == ".ElementId" || last == ".Id"
+	}, cmp.Ignore()))...)
 	if diffNodes != "" {
 		t.Fatal(diffNodes)
 	}
 
-	diffEdges := cmp.Diff(edgeFrame, expectedEdges, data.FrameTestCompareOptions()...)
-	if diffEdges != "" {
-		t.Fatal(diffEdges)
+	// Ignore elementID and ID in the comparison as this can change and is dynamic. Neo4J clearly states that 
+	// although these internal identifiers are always part of the generated change events, they are not safe to 
+	//track data out of the scope of a single transaction.
+	diff := cmp.Diff(edgeFrame, expectedEdges, append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
+		last := p.Last().String()
+		return last == ".ElementId" || last == ".Id"
+	}, cmp.Ignore()))...)
+	if diff != "" {
+		t.Fatal(diff)
 	}
-
 }
 
 func runNeo4JIntegrationTableTest(t *testing.T, cypher string, expected *data.Frame) {
@@ -578,10 +586,12 @@ func runNeo4JIntegrationTableTest(t *testing.T, cypher string, expected *data.Fr
 	frameAsTable, _ := frame.StringTable(-1, -1)
 	fmt.Println("Actual:\n", frameAsTable)
 
-	// Ignore elementID in the comparison as this can change and is dynamic. 
+	// Ignore elementID and ID in the comparison as this can change and is dynamic. Neo4J clearly states that 
+	// although these internal identifiers are always part of the generated change events, they are not safe to 
+	//track data out of the scope of a single transaction.
 	diff := cmp.Diff(frame, expected, append(data.FrameTestCompareOptions(), cmp.FilterPath(func(p cmp.Path) bool {
 		last := p.Last().String()
-		return last == ".ElementId" || last == ".id"
+		return last == ".ElementId" || last == ".Id"
 	}, cmp.Ignore()))...)
 	if diff != "" {
 		t.Fatal(diff)
