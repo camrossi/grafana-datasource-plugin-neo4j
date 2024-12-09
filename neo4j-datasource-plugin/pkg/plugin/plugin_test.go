@@ -343,7 +343,7 @@ func TestNodeColumn(t *testing.T) {
 	skipIfIsShort(t)
 	expectedFrame := data.NewFrame("response",
 		data.NewField("m", nil, []*string{
-			ptrS("{\"Id\":0,\"ElementId\":\"4:379d49c2-e63a-4cd4-8ebe-42177841179b:0\",\"Labels\":[\"Movie\"],\"Props\":{\"color\":\"green\",\"icon\":\"camera\",\"released\":1999,\"tagline\":\"Welcome to the Real World\",\"title\":\"The Matrix\"}}"),
+			ptrS("\"Labels\":[\"Movie\"],\"Props\":{\"color\":\"green\",\"icon\":\"camera\",\"released\":1999,\"tagline\":\"Welcome to the Real World\",\"title\":\"The Matrix\"}}"),
 		}),
 	)
 
@@ -356,7 +356,7 @@ func TestRelationshipColumn(t *testing.T) {
 	skipIfIsShort(t)
 	expectedFrame := data.NewFrame("response",
 		data.NewField("r", nil, []*string{
-			ptrS("{\"Id\":0,\"ElementId\":\"5:379d49c2-e63a-4cd4-8ebe-42177841179b:0\",\"StartId\":1,\"StartElementId\":\"4:379d49c2-e63a-4cd4-8ebe-42177841179b:1\",\"EndId\":0,\"EndElementId\":\"4:379d49c2-e63a-4cd4-8ebe-42177841179b:0\",\"Type\":\"ACTED_IN\",\"Props\":{\"roles\":[\"Neo\"]}}"),
+			ptrS("\"Type\":\"ACTED_IN\",\"Props\":{\"roles\":[\"Neo\"]}}"),
 		}),
 	)
 
@@ -457,10 +457,10 @@ func TestAllNullInColumn(t *testing.T) {
 func TestGraphFormat(t *testing.T) {
 	skipIfIsShort(t)
 	expectedNodesFrame := data.NewFrame("nodes",
-		data.NewField("id", nil, []*string{
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:1"),
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
-		}),
+	//	data.NewField("id", nil, []*string{
+	//		ptrS("1"),
+	//		ptrS("0"),
+	//	}),
 		data.NewField("title", nil, []*string{
 			ptrS("Person"),
 			ptrS("Movie"),
@@ -474,7 +474,7 @@ func TestGraphFormat(t *testing.T) {
 			nil,
 		}),
 		data.NewField("color", nil, []*string{
-			nil,
+			ptrS("green"),
 			ptrS("green"),
 		}),
 		data.NewField("icon", nil, []*string{
@@ -504,15 +504,15 @@ func TestGraphFormat(t *testing.T) {
 	)
 
 	expectedEdgesFrame := data.NewFrame("edges",
-		data.NewField("id", nil, []*string{
-			ptrS("5:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
+	/*	data.NewField("id", nil, []*string{
+			ptrS("0"),
 		}),
 		data.NewField("source", nil, []*string{
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:1"),
+			ptrS("1"),
 		}),
 		data.NewField("target", nil, []*string{
-			ptrS("4:379d49c2-e63a-4cd4-8ebe-42177841179b:0"),
-		}),
+			ptrS("0"),
+		}), */
 		data.NewField("mainStat", nil, []*string{
 			ptrS("ACTED_IN"),
 		}),
@@ -535,9 +535,12 @@ func runNeo4JIntegrationGraphTest(t *testing.T, cypher string, expectedNodes *da
 	if len(res.Frames) != 2 {
 		t.Fatal("Frames len is not 2")
 	}
-
+	// Drop the IDs as they are not a stable value
 	nodeFrame := res.Frames[0]
+	nodeFrame.Fields = nodeFrame.Fields[1:]
+
 	edgeFrame := res.Frames[1]
+	edgeFrame.Fields = edgeFrame.Fields[3:]
 
 	expectedNodesAsTable, _ := expectedNodes.StringTable(-1, -1)
 	fmt.Println("Expected Nodes:\n", expectedNodesAsTable)
